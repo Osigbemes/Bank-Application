@@ -41,6 +41,7 @@ class CustomerAccount(AbstractBaseUser, PermissionsMixin):
     start_date = models.DateTimeField(default=timezone.now)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    bankName = models.CharField(max_length=200, null=True, blank=True)
     token = models.TextField(blank=True)
     objects = CustomAccountManager()
     
