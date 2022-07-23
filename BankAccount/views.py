@@ -13,10 +13,14 @@ import random, string
 from rest_framework.permissions import AllowAny
 
 def generate_account_id():
-    return get_random_string(10, allowed_chars='0123456789')
+    account_number = get_random_string(10, allowed_chars='0123456789')
+    checkAccountNumber = CustomerAccount.objects.filter(accountNumber=account_number).exists()
+    if not checkAccountNumber:
+        return account_number
+    generate_account_id()
 
-def random_account_number():
-    return ''.join(random.choice(string.digits) for _ in range(10))
+# def random_account_number():
+#     return ''.join(random.choice(string.digits) for _ in range(10))
 
 class RegisterAccount(APIView):
     permission_classes=[AllowAny]
@@ -28,11 +32,6 @@ class RegisterAccount(APIView):
         if serializer.is_valid():
             user = serializer.save()
             user.accountNumber = generate_account_id()
-
-            # check if account number exist
-            checkAccountNumber = CustomerAccount.objects.filter(accountNumber=user.accountNumber).exists()
-            if checkAccountNumber:
-                user.accountNumber = random_account_number()
 
             token=RefreshToken.for_user(user).access_token
             user.token = token
