@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinLengthValidator
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
-
 class CustomAccountManager(BaseUserManager):
 
     def create_superuser(self, accountNumber, accountName, password, **other_fields):
