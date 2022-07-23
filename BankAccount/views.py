@@ -12,15 +12,14 @@ from django.utils.crypto import get_random_string
 import random, string
 from rest_framework.permissions import AllowAny
 
+def generate_account_id():
+    return get_random_string(10, allowed_chars='0123456789')
+
+def random_account_number():
+    return ''.join(random.choice(string.digits) for _ in range(10))
+
 class RegisterAccount(APIView):
     permission_classes=[AllowAny]
-    #create random account number
-    def generate_account_id():
-        return get_random_string(10, allowed_chars='0123456789')
-    
-    #another option
-    num = ''.join(random.choice(string.digits) for _ in range(10))
-    number = generate_account_id()
 
     queryset = CustomerAccount.objects.all()
 
@@ -28,12 +27,12 @@ class RegisterAccount(APIView):
         serializer = CreateCustomerAccountSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            user.accountNumber = self.num
-            print (user.accountNumber)
-            #check if account number exist
+            user.accountNumber = generate_account_id()
+
+            # check if account number exist
             checkAccountNumber = CustomerAccount.objects.filter(accountNumber=user.accountNumber).exists()
             if checkAccountNumber:
-                return Response({"This account number exist!"}, status=status.HTTP_400_BAD_REQUEST)
+                user.accountNumber = random_account_number()
 
             token=RefreshToken.for_user(user).access_token
             user.token = token
