@@ -56,4 +56,4 @@ class DepositSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BankTransaction
-        fields = '__all__'
+        fields = ('beneficiaryAccountNumber', 'Amount')

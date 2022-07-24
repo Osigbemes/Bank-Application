@@ -114,8 +114,9 @@ class Deposit(generics.CreateAPIView):
 
         #check for the right amount of money to be deposited
         amount = Decimal(request.data['Amount'])
-        if amount < 100.00 and amount > 1000000.00:
-            return Response({'success':False, 'message':'Amount has exceeded a million naira or lower than hundred naira!!'})
+        print (amount)
+        if amount < 100.00 or amount > 1000000.00:
+            return Response({'success':False, 'message':'Amount has exceeded a million naira or lower than hundred naira!!'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.serializer_class(data=request.data)
 
@@ -128,12 +129,12 @@ class Deposit(generics.CreateAPIView):
                 beneficiaryAccount.balance+=transactionDetails.Amount
                 beneficiaryAccount.save()
 
-            ownerAccount = get_object_or_404(self.queryset, accountNumber=request.data['accountNumber'])
-            if ownerAccount:
-                ownerAccount.balance-=transactionDetails.Amount
-                ownerAccount.save()
+            # ownerAccount = get_object_or_404(self.queryset, accountNumber=request.data['accountNumber'])
+            # if ownerAccount:
+            #     ownerAccount.balance-=transactionDetails.Amount
+            #     ownerAccount.save()
 
             #save some details in the transacction table
             transactionDetails.save()
-            return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
+            return Response({'success':True, 'message':f'You have credited this account {transactionDetails.beneficiaryAccountNumber} with {transactionDetails.Amount}'}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
