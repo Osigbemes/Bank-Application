@@ -32,15 +32,16 @@ class RegisterAccount(APIView):
         serializer = CreateCustomerAccountSerializer(data=request.data)
         
         if serializer.is_valid():
-            # print (serializer.data['accountName'], serializer.data['accountNumber'])
-            user = serializer.save()
-
             #check if initial deposit is less than 500
             initial_deposit = Decimal(serializer.data['initialDeposit'])
-            print (type(initial_deposit))
+            # print (type(initial_deposit))
             if initial_deposit < 500.0:
                 return Response({"Error":"Initial deposit should be 500 and above"}, status=status.HTTP_400_BAD_REQUEST)
 
+            # print (serializer.data['accountName'], serializer.data['accountNumber'])
+            user = serializer.save()
+
+            
             token=RefreshToken.for_user(user).access_token
             user.token = token
             user.bankName = user.accountName
