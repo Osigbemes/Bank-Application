@@ -52,7 +52,7 @@ class CustomerAccount(AbstractBaseUser, PermissionsMixin):
         return self.accountName
 
 class Bank(models.Model):
-    
+    accountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10, unique=True, null=True)
     bankName = models.CharField(max_length=200)
     balance = models.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
     customer = models.OneToOneField(CustomerAccount, on_delete=models.SET_NULL, null=True, blank=True)
