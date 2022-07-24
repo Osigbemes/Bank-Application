@@ -72,5 +72,5 @@ class BankTransaction(models.Model):
     Amount = models.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
     transactionDate = models.DateTimeField(default=timezone.now)
     narration = models.TextField(blank=True)
-    accountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10, unique=True)
-    beneficiaryAccountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10, unique=True)
+    accountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10)
+    beneficiaryAccountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10)

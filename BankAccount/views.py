@@ -123,10 +123,10 @@ class Deposit(generics.CreateAPIView):
             
             transactionDetails = serializer.save()
 
-            depositAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.accountNumber)
-            if depositAccount:
-                depositAccount.balance+=transactionDetails.Amount
-                depositAccount.save()
+            beneficiaryAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.beneficiaryAccountNumber)
+            if beneficiaryAccount:
+                beneficiaryAccount.balance+=transactionDetails.Amount
+                beneficiaryAccount.save()
 
             ownerAccount = get_object_or_404(self.queryset, accountNumber=request.data['accountNumber'])
             if ownerAccount:
