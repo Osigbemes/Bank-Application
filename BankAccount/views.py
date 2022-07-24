@@ -1,6 +1,7 @@
 from decimal import Decimal
 import numbers
 from urllib import request
+from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
@@ -50,7 +51,7 @@ class RegisterAccount(APIView):
             Bank.objects.filter(customer=user).update(balance=user.initialDeposit, bankName = user.accountName)
             
             if user:
-                return Response({'success':True, 'message':'Account created successfully'}, status=status.HTTP_201_CREATED)
+                return Response({'success':True, 'message':f'Account created successfully {serializer.data}'}, status=status.HTTP_201_CREATED)
         return Response({'success':False, 'message':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -78,6 +79,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['is_staff']=user.is_staff
         token['is_active']=user.is_active
         return token
+        # return Response({'success':True}, status=status.HTTP_201_CREATED)
 
-class MyTokenObtainPairView(TokenObtainPairView):
+class Login(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
