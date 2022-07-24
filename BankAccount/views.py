@@ -5,11 +5,12 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
+from rest_framework import generics
 from .models import Bank, BankTransaction, CustomerAccount
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, GetAccountInfo, GetAccountStatementSerializer, TransactionSerializer
+from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, DepositSerializer, GetAccountInfo, GetAccountStatementSerializer, TransactionSerializer
 from django.utils.crypto import get_random_string
 import random, string
 from rest_framework.permissions import AllowAny
@@ -102,5 +103,37 @@ class GetAccountStatement(APIView):
         accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
         serializer = self.serializer_class(accountStatement)
         if accountStatement:
+            return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
+        return Response({'success':False, 'message':serializer.errors})
+
+class Deposit(generics.CreateAPIView):
+    queryset = Bank
+    serializer_class = DepositSerializer
+
+    def post(self, request):
+
+        #check for the right amount of money to be deposited
+        amount = Decimal(request.data['Amount'])
+        if amount < 100.00 and amount > 1000000.00:
+            return Response({'success':False, 'message':'Amount has exceeded a million naira or lower than hundred naira!!'})
+
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            
+            transactionDetails = serializer.save()
+
+            depositAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.accountNumber)
+            if depositAccount:
+                depositAccount.balance+=transactionDetails.Amount
+                depositAccount.save()
+
+            ownerAccount = get_object_or_404(self.queryset, accountNumber=request.data['accountNumber'])
+            if ownerAccount:
+                ownerAccount.balance-=transactionDetails.Amount
+                ownerAccount.save()
+
+            #save some details in the transacction table
+            transactionDetails.save()
             return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})

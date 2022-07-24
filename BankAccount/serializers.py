@@ -52,7 +52,7 @@ class CreateBankSerializer(serializers.ModelSerializer):
         model = Bank
         fields = '__all__'
 
-class CreateBankSerializer(serializers.ModelSerializer):
+class DepositSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BankTransaction
