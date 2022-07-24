@@ -54,7 +54,10 @@ class Bank(models.Model):
     
     bankName = models.CharField(max_length=200)
     balance = models.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
-    customer = models.ForeignKey(CustomerAccount, on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.OneToOneField(CustomerAccount, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.customer.accountName
 
 class BankTransaction(models.Model):
     TRANSACTIONTYPE=(

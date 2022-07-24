@@ -29,9 +29,11 @@ class RegisterAccount(APIView):
 
     def post(self, request):
         serializer = CreateCustomerAccountSerializer(data=request.data)
+        
         if serializer.is_valid():
+            # print (serializer.data['accountName'], serializer.data['accountNumber'])
             user = serializer.save()
-            user.accountNumber = generate_account_id()
+            # serializer.accountNumber = generate_account_id()
 
             token=RefreshToken.for_user(user).access_token
             user.token = token
