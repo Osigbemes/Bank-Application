@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (BlacklistTokenUpdateView, RegisterAccount, Login, GetAccountInfo)
+from .views import (BlacklistTokenUpdateView, GetAccountStatement, RegisterAccount, Login, GetAccountInfo)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -13,5 +13,6 @@ urlpatterns = [
          name='blacklist'),
     path('login/', Login.as_view(), name='token_obtain_pair'),
     path('account_info/<str:accountNumber>/<str:password>', GetAccountInfo.as_view(), name='get_account_info'),
+    path('account_statement/<str:accountNumber>', GetAccountStatement.as_view(), name='get_account_statement'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

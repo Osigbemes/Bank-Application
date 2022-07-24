@@ -9,7 +9,7 @@ from .models import Bank, BankTransaction, CustomerAccount
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, GetAccountInfo, TransactionSerializer
+from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, GetAccountInfo, GetAccountStatementSerializer, TransactionSerializer
 from django.utils.crypto import get_random_string
 import random, string
 from rest_framework.permissions import AllowAny
@@ -92,5 +92,15 @@ class GetAccountInfo(APIView):
         accountDetails=get_object_or_404(self.queryset, accountNumber=accountNumber)
         serializer = self.serializer_class(accountDetails)
         if accountDetails:
+            return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
+        return Response({'success':False, 'message':serializer.errors})
+
+class GetAccountStatement(APIView):
+    queryset = BankTransaction
+    serializer_class = GetAccountStatementSerializer
+    def get(self, request, accountNumber):
+        accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
+        serializer = self.serializer_class(accountStatement)
+        if accountStatement:
             return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})

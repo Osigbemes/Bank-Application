@@ -40,8 +40,20 @@ class GetAccountInfo(serializers.ModelSerializer):
         model = Bank
         fields = '__all__'
 
+class GetAccountStatementSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BankTransaction
+        fields = '__all__'
+
 class CreateBankSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bank
+        fields = '__all__'
+
+class CreateBankSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BankTransaction
         fields = '__all__'
