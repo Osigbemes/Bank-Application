@@ -1,3 +1,4 @@
+from decimal import Decimal
 import numbers
 from urllib import request
 from django.shortcuts import render
@@ -33,11 +34,20 @@ class RegisterAccount(APIView):
         if serializer.is_valid():
             # print (serializer.data['accountName'], serializer.data['accountNumber'])
             user = serializer.save()
-            # serializer.accountNumber = generate_account_id()
+
+            #check if initial deposit is less than 500
+            initial_deposit = Decimal(serializer.data['initialDeposit'])
+            print (type(initial_deposit))
+            if initial_deposit < 500.0:
+                return Response({"Error":"Initial deposit should be 500 and above"}, status=status.HTTP_400_BAD_REQUEST)
 
             token=RefreshToken.for_user(user).access_token
             user.token = token
+            user.bankName = user.accountName
             user.save()
+            
+            #user already has a bank account
+            Bank.objects.filter(customer=user).update(balance=user.initialDeposit, bankName = user.accountName)
             
             if user:
                 return Response(serializer.data, status=status.HTTP_201_CREATED)

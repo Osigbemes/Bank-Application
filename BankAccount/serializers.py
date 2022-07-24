@@ -8,11 +8,10 @@ def random_account_number():
 
 class CreateCustomerAccountSerializer(serializers.ModelSerializer):
     password = serializers.CharField(min_length=8, write_only=True)
-    # initialDeposit = serializers.DecimalField(max_digits=10, decimal_places=2, default=Decimal(0.00))
 
     class Meta:
         model = CustomerAccount
-        fields = ('accountName', 'password')
+        fields = ('accountName', 'password', 'initialDeposit')
         extra_kwargs = {'password': {'write_only':True}}
 
     def create(self, validated_data):

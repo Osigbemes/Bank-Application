@@ -41,6 +41,7 @@ class CustomerAccount(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     bankName = models.CharField(max_length=200, null=True, blank=True)
+    initialDeposit = models.DecimalField(null=True,max_digits=10, decimal_places=2, default=Decimal(0.00))
     token = models.TextField(blank=True)
     objects = CustomAccountManager()
     

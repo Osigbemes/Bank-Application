@@ -7,8 +7,9 @@ from .models import Bank, CustomerAccount
 
 @receiver(post_save, sender=CustomerAccount)
 def create_bank_details(sender, instance, created, **kwargs):
-	if created:
-		Bank.objects.create(customer=instance)
+    
+    if created:
+        Bank.objects.create(customer=instance)
        
 
 @receiver(post_save, sender=CustomerAccount)
