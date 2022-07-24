@@ -32,6 +32,12 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BankTransaction
+        fields = ('balance',)
+
+class GetAccountInfo(serializers.ModelSerializer):
+
+    class Meta:
+        model = Bank
         fields = '__all__'
 
 class CreateBankSerializer(serializers.ModelSerializer):

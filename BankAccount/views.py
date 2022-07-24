@@ -2,14 +2,14 @@ from decimal import Decimal
 import numbers
 from urllib import request
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
 from .models import Bank, BankTransaction, CustomerAccount
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, TransactionSerializer
+from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, GetAccountInfo, TransactionSerializer
 from django.utils.crypto import get_random_string
 import random, string
 from rest_framework.permissions import AllowAny
@@ -48,7 +48,8 @@ class RegisterAccount(APIView):
             user.save()
             
             #user already has a bank account
-            Bank.objects.filter(customer=user).update(balance=user.initialDeposit, bankName = user.accountName)
+            Bank.objects.filter(customer=user).update(balance=user.initialDeposit,
+             bankName = user.accountName, accountNumber=user.accountNumber, accountName=user.accountName)
             
             if user:
                 return Response({'success':True, 'message':f'Account created successfully {serializer.data}'}, status=status.HTTP_201_CREATED)
@@ -83,3 +84,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class Login(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+class GetAccountInfo(APIView):
+    queryset = Bank
+    serializer_class = GetAccountInfo
+    def get(self, request, accountNumber, password):
+        accountDetails=get_object_or_404(self.queryset, accountNumber=accountNumber)
+        serializer = self.serializer_class(accountDetails)
+        if accountDetails:
+            return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
+        return Response({'success':False, 'message':serializer.errors})

@@ -54,6 +54,7 @@ class CustomerAccount(AbstractBaseUser, PermissionsMixin):
 class Bank(models.Model):
     accountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10, unique=True, null=True)
     bankName = models.CharField(max_length=200)
+    accountName = models.CharField(max_length=150, unique=True, null=True)
     balance = models.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
     customer = models.OneToOneField(CustomerAccount, on_delete=models.SET_NULL, null=True, blank=True)
 
