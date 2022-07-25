@@ -141,23 +141,25 @@ class Deposit(generics.CreateAPIView):
 
 class Withdrawal(generics.CreateAPIView):
 
-    serializer = WithdrawalSerializer
+    serializer_class = WithdrawalSerializer
     queryset=Bank
 
     def post(self, request):
-        serializer_class = self.serializer(data=request.data)
-        if serializer_class.is_valid():
-            user_account = serializer_class.save()
+        serializer= self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user_account = serializer.save()
 
-            bank = get_object_or_404(self.queryset, accountNumber=user_account.accountNumber)
+            # bank = get_object_or_404(self.queryset, accountNumber=user_account.accountNumber)
+            bank = self.queryset.objects.filter(accountNumber=user_account.accountNumber).first()
+            print(bank)
             if bank:
                 balance = bank.balance
-                if balance-user_account.withdrawnAmount >= 500:
-                    bank.balance-=user_account.withdrawnAmount
+                if balance-user_account.balance >= 500:
+                    bank.balance-=user_account.balance
                     bank.save()
-                if balance-user_account.withdrawnAmount < 1:
+                if balance-user_account.balance < 1:
                     return Response({"success":False,"message":"Unable to withdraw, left balance is #1"}, status=status.HTTP_400_BAD_REQUEST)
 
-                return Response({'success':True, 'message':f'You account has been debited with {user_account.withdrawnAmount}, left balance is #{bank.balance}'}, status=status.HTTP_200_OK)
+                return Response({'success':True, 'message':f'You account has been debited with {user_account.balance}, left balance is #{bank.balance}'}, status=status.HTTP_200_OK)
 
-        return Response({'success':False, 'message':serializer_class.errors})
+        return Response({'success':False, 'message':serializer.errors})

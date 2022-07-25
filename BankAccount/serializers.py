@@ -59,8 +59,27 @@ class DepositSerializer(serializers.ModelSerializer):
         fields = ('beneficiaryAccountNumber', 'Amount')
 
 class WithdrawalSerializer(serializers.ModelSerializer):
-    withdrawnAmount = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
+    # withdrawnAmount = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
+    # accountNumber = serializers.CharField(max_length=10)
 
     class Meta:
         model = Bank
-        fields = ('accountNumber', 'withdrawnAmount')
+        fields = ('accountNumber', 'balance')
+        # extra_kwargs = {'withdrawnAmount':{'read_only':True}}
+
+    # def create(self, validated_data):
+    #     withdrawnAmount = validated_data.pop('withdrawnAmount', None)
+    #     accountNumber = validated_data.pop('accountNumber', None)
+    #     instance = self.Meta.model(**validated_data)
+    #     instance.save()
+
+    #     return instance
+        
+    # def update(self, instance, validated_data):
+    #     instance.withdrawnAmount = validated_data.get('withdrawnAmount', instance.withdrawnAmount)
+    #     instance.accountNumber = validated_data.get('accountNumber', instance.accountNumber)
+    #     instance.save()
+
+    #     return instance
+
+    
