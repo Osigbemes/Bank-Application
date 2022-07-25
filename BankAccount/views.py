@@ -160,7 +160,7 @@ class Withdrawal(generics.CreateAPIView):
                 if balance-amountLeft <= 1.00:
                     return Response({"success":False,"message":"Unable to withdraw, insufficient funds."}, status=status.HTTP_400_BAD_REQUEST)
 
-                balance-=user_account['withdrawnAmount']
+                bank.balance-=user_account['withdrawnAmount']
                 bank.save()
                 return Response({'success':True, 'message':'Your account has been debited with '+ str(user_account['withdrawnAmount'])+ ', left balance is '+f'{bank.balance}'}, status=status.HTTP_200_OK)
 
