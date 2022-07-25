@@ -10,7 +10,7 @@ from .models import Bank, BankTransaction, CustomerAccount
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, DepositSerializer, GetAccountInfo, GetAccountStatementSerializer, TransactionSerializer
+from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, DepositSerializer, GetAccountInfo, GetAccountStatementSerializer, TransactionSerializer, WithdrawalSerializer
 from django.utils.crypto import get_random_string
 import random, string
 from rest_framework.permissions import AllowAny
@@ -138,3 +138,26 @@ class Deposit(generics.CreateAPIView):
             transactionDetails.save()
             return Response({'success':True, 'message':f'You have credited this account {transactionDetails.beneficiaryAccountNumber} with {transactionDetails.Amount}'}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
+
+class Withdrawal(generics.CreateAPIView):
+
+    serializer = WithdrawalSerializer
+    queryset=Bank
+
+    def post(self, request):
+        serializer_class = self.serializer(data=request.data)
+        if serializer_class.is_valid():
+            user_account = serializer_class.save()
+
+            bank = get_object_or_404(self.queryset, accountNumber=user_account.accountNumber)
+            if bank:
+                balance = bank.balance
+                if balance-user_account.withdrawnAmount >= 500:
+                    bank.balance-=user_account.withdrawnAmount
+                    bank.save()
+                if balance-user_account.withdrawnAmount < 1:
+                    return Response({"success":False,"message":"Unable to withdraw, left balance is #1"}, status=status.HTTP_400_BAD_REQUEST)
+
+                return Response({'success':True, 'message':f'You account has been debited with {user_account.withdrawnAmount}, left balance is #{bank.balance}'}, status=status.HTTP_200_OK)
+
+        return Response({'success':False, 'message':serializer_class.errors})

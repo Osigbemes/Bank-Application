@@ -57,3 +57,10 @@ class DepositSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankTransaction
         fields = ('beneficiaryAccountNumber', 'Amount')
+
+class WithdrawalSerializer(serializers.ModelSerializer):
+    withdrawnAmount = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
+
+    class Meta:
+        model = Bank
+        fields = ('accountNumber', 'withdrawnAmount')
