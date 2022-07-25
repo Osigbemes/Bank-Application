@@ -100,7 +100,8 @@ class GetAccountStatement(APIView):
     queryset = BankTransaction
     serializer_class = GetAccountStatementSerializer
     def get(self, request, accountNumber):
-        accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
+        # accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
+        accountStatement=self.queryset.objects.filter(accountNumber=accountNumber).first()
         serializer = self.serializer_class(accountStatement)
         if accountStatement:
             return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)

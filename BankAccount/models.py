@@ -74,3 +74,6 @@ class BankTransaction(models.Model):
     narration = models.TextField(blank=True)
     accountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10)
     beneficiaryAccountNumber = models.CharField(validators=[MinLengthValidator(10)], max_length=10)
+
+    # def __str__(self):
+    #     return self.bankName, self.transactionType
