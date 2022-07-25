@@ -124,8 +124,8 @@ class Deposit(generics.CreateAPIView):
             
             transactionDetails = serializer.save()
 
-            # beneficiaryAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.beneficiaryAccountNumber)
-            beneficiaryAccount=self.queryset.objects.filter(accountNumber=transactionDetails.beneficiaryAccountNumber).first()
+            beneficiaryAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.beneficiaryAccountNumber)
+            # beneficiaryAccount=self.queryset.objects.filter(accountNumber=transactionDetails.beneficiaryAccountNumber).first()
             if beneficiaryAccount:
                 beneficiaryAccount.balance+=transactionDetails.Amount
                 beneficiaryAccount.save()
@@ -150,8 +150,8 @@ class Withdrawal(generics.CreateAPIView):
         if serializer.is_valid():
             user_account = serializer.save()
 
-            # bank = get_object_or_404(self.queryset, accountNumber=user_account.accountNumber)
-            bank = self.queryset.objects.filter(accountNumber=user_account['accountNumber']).first()
+            bank = get_object_or_404(self.queryset, accountNumber=user_account['accountNumber'])
+            # bank = self.queryset.objects.filter(accountNumber=user_account['accountNumber']).first()
             amountLeft= user_account['withdrawnAmount']
             if bank:
                 balance = bank.balance
