@@ -87,7 +87,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class Login(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
-class GetAccountInfo(APIView):
+class GetAccountInfo(generics.RetrieveAPIView):
     queryset = Bank
     serializer_class = GetAccountInfo
     def get(self, request, accountNumber, password):
