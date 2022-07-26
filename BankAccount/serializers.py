@@ -59,7 +59,6 @@ class DepositSerializer(serializers.ModelSerializer):
             ('Withdrawal', 'Withdrawal')
         )
 
-    # transactionType = serializers.ChoiceField(choices=TRANSACTIONTYPE, default=TRANSACTIONTYPE[1])
     transactionType = serializers.HiddenField(default=TRANSACTIONTYPE[0])
 
     class Meta:
@@ -67,6 +66,12 @@ class DepositSerializer(serializers.ModelSerializer):
         fields = ('beneficiaryAccountNumber', 'Amount', 'transactionType')
 
 class WithdrawalSerializer(serializers.Serializer):
+    TRANSACTIONTYPE=(
+            ('Deposit', 'Deposit'),
+            ('Withdrawal', 'Withdrawal')
+        )
+        
+    transactionType = serializers.HiddenField(default=TRANSACTIONTYPE[1])
     withdrawnAmount = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
     accountNumber = serializers.CharField(max_length=10)
 
