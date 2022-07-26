@@ -17,13 +17,14 @@ from .models import BankTransaction
 from rest_framework.permissions import AllowAny
 
 
-class RegisterAccount(APIView):
+class RegisterAccount(generics.CreateAPIView):
     permission_classes=[AllowAny]
 
     queryset = CustomerAccount.objects.all()
+    serializer_class = CreateCustomerAccountSerializer
 
     def post(self, request):
-        serializer = CreateCustomerAccountSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         
         if serializer.is_valid():
 
