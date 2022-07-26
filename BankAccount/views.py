@@ -95,7 +95,7 @@ class GetAccountStatement(generics.RetrieveAPIView):
         accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
         serializer = self.serializer_class(accountStatement)
         if serializer:
-            return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
 
 class Deposit(generics.CreateAPIView):
@@ -117,7 +117,7 @@ class Deposit(generics.CreateAPIView):
             transactionDetails = serializer.save()
 
             beneficiaryAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.accountNumber)
-            # beneficiaryAccount=self.queryset.objects.filter(accountNumber=transactionDetails.beneficiaryAccountNumber).first()
+            
             if beneficiaryAccount:
                 beneficiaryAccount.balance+=transactionDetails.amount
                 beneficiaryAccount.transactionType = transactionDetails.transactionType[0]

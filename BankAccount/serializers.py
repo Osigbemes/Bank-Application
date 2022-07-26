@@ -44,11 +44,20 @@ class GetAccountInfo(serializers.Serializer):
         
         return validated_data
 
-class GetAccountStatementSerializer(serializers.ModelSerializer):
+class GetAccountStatementSerializer(serializers.Serializer):
+    TRANSACTIONTYPE=(
+            ('Deposit', 'Deposit'),
+            ('Withdrawal', 'Withdrawal')
+        )
 
-    class Meta:
-        model = Bank
-        fields = '__all__'
+    transactionType = serializers.ChoiceField(choices=TRANSACTIONTYPE)
+    transactionDate = serializers.DateTimeField()
+    narration = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
+    accountBalance = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
+
+    def create(self, validated_data):
+        return validated_data
 
 class CreateBankSerializer(serializers.ModelSerializer):
 
