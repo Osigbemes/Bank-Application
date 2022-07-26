@@ -94,7 +94,7 @@ class GetAccountInfo(APIView):
         accountDetails=get_object_or_404(self.queryset, accountNumber=accountNumber)
         serializer = self.serializer_class(accountDetails)
         if accountDetails:
-            return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
+            return Response({'success':True,'message':'Get account statement successful', 'account':serializer.data}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
 
 class GetAccountStatement(generics.RetrieveAPIView):
@@ -103,7 +103,6 @@ class GetAccountStatement(generics.RetrieveAPIView):
 
     def get(self, request, accountNumber):
         accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
-        # accountStatement=self.queryset.objects.filter(accountNumber=accountNumber).first()
         serializer = self.serializer_class(accountStatement)
         if serializer:
             return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)

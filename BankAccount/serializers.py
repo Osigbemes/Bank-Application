@@ -35,11 +35,14 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = BankTransaction
         fields = ('balance',)
 
-class GetAccountInfo(serializers.ModelSerializer):
+class GetAccountInfo(serializers.Serializer):
+    accountName = serializers.CharField(max_length=150)
+    accountNumber = serializers.CharField( max_length=10)
+    balance = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
 
-    class Meta:
-        model = Bank
-        fields = '__all__'
+    def create(self, validated_data):
+        
+        return validated_data
 
 class GetAccountStatementSerializer(serializers.ModelSerializer):
 
