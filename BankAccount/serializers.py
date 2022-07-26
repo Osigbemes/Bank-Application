@@ -77,6 +77,7 @@ class WithdrawalSerializer(serializers.Serializer):
     transactionType = serializers.HiddenField(default=TRANSACTIONTYPE[1])
     withdrawnAmount = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))
     accountNumber = serializers.CharField(max_length=10)
+    accountPassword = serializers.CharField(min_length=8, write_only=True)
 
     def create(self, validated_data):
         

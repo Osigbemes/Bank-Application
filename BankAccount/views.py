@@ -145,7 +145,6 @@ class Withdrawal(generics.CreateAPIView):
             user_account = serializer.save()
 
             bank = get_object_or_404(self.queryset, accountNumber=user_account['accountNumber'])
-            # bank = self.queryset.objects.filter(accountNumber=user_account['accountNumber']).first()
             amountLeft= user_account['withdrawnAmount']
             if bank:
                 balance = bank.balance
@@ -153,7 +152,7 @@ class Withdrawal(generics.CreateAPIView):
                     return Response({"success":False,"message":"Unable to withdraw, insufficient funds."}, status=status.HTTP_400_BAD_REQUEST)
                 if balance-amountLeft <= 1.00:
                     return Response({"success":False,"message":"Unable to withdraw, insufficient funds."}, status=status.HTTP_400_BAD_REQUEST)
-                print (user_account)
+                
                 bank.balance-=user_account['withdrawnAmount']
                 bank.transactionType = user_account['transactionType'][1]
                 bank.amount=user_account['withdrawnAmount']
@@ -162,7 +161,7 @@ class Withdrawal(generics.CreateAPIView):
 
                 #create a transaction table for the withdrawal
                 transaction = BankTransaction.objects.create(transactionType = user_account['transactionType'][1], bankName =bank.bankName,
-                narration=f"{user_account['transactionType'][1]}"+ ' of'+ f" {user_account['withdrawnAmount']}", Amount=user_account['withdrawnAmount'],accountNumber=bank.accountNumber )
+                narration=f"{user_account['transactionType'][1]}"+ ' of'+ f" {user_account['withdrawnAmount']}", amount=user_account['withdrawnAmount'],accountNumber=bank.accountNumber )
 
                 return Response({'success':True, 'message':'Your account has been debited with '+ str(user_account['withdrawnAmount'])+ ', left balance is '+f'{bank.balance}'}, status=status.HTTP_200_OK)
 
