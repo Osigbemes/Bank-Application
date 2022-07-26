@@ -8,22 +8,22 @@ def random_account_number():
     return ''.join(random.choice(string.digits) for _ in range(10))
 
 class CreateCustomerAccountSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(min_length=8, write_only=True)
+    accountPassword = serializers.CharField(min_length=8, write_only=True)
 
     class Meta:
         model = CustomerAccount
-        fields = ('accountName', 'password', 'initialDeposit', 'accountNumber')
+        fields = ('accountName', 'accountPassword', 'initialDeposit', 'accountNumber')
         extra_kwargs = {'password': {'write_only':True}, 'accountNumber':{'read_only':True}}
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
+        accountPassword = validated_data.pop('accountPassword', None)
         instance = self.Meta.model(**validated_data)
 
         #setting the account number
         instance.accountNumber = random_account_number()
 
-        if password is not None:
-            instance.set_password(password)
+        if accountPassword is not None:
+            instance.set_password(accountPassword)
         instance.is_active=True
         instance.save()
         return instance
