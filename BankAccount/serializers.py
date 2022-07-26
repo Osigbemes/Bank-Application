@@ -1,4 +1,5 @@
 from decimal import Decimal
+from email.policy import default
 from rest_framework import serializers
 from .models import CustomerAccount, BankTransaction, Bank
 import random, string
@@ -53,10 +54,17 @@ class CreateBankSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DepositSerializer(serializers.ModelSerializer):
+    TRANSACTIONTYPE=(
+            ('Deposit', 'Deposit'),
+            ('Withdrawal', 'Withdrawal')
+        )
+
+    # transactionType = serializers.ChoiceField(choices=TRANSACTIONTYPE, default=TRANSACTIONTYPE[1])
+    transactionType = serializers.HiddenField(default=TRANSACTIONTYPE[0])
 
     class Meta:
         model = BankTransaction
-        fields = ('beneficiaryAccountNumber', 'Amount')
+        fields = ('beneficiaryAccountNumber', 'Amount', 'transactionType')
 
 class WithdrawalSerializer(serializers.Serializer):
     withdrawnAmount = serializers.DecimalField(max_digits=30, decimal_places=2, default=Decimal(0.00))

@@ -13,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import CreateCustomerAccountSerializer, CreateBankSerializer, DepositSerializer, GetAccountInfo, GetAccountStatementSerializer, TransactionSerializer, WithdrawalSerializer
 from django.utils.crypto import get_random_string
 import random, string
+from .models import BankTransaction
 from rest_framework.permissions import AllowAny
 
 def generate_account_id():
@@ -100,10 +101,10 @@ class GetAccountStatement(APIView):
     queryset = BankTransaction
     serializer_class = GetAccountStatementSerializer
     def get(self, request, accountNumber):
-        # accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
-        accountStatement=self.queryset.objects.filter(accountNumber=accountNumber).first()
+        accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
+        # accountStatement=self.queryset.objects.filter(accountNumber=accountNumber).first()
         serializer = self.serializer_class(accountStatement)
-        if accountStatement:
+        if serializer:
             return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
 
@@ -115,7 +116,7 @@ class Deposit(generics.CreateAPIView):
 
         #check for the right amount of money to be deposited
         amount = Decimal(request.data['Amount'])
-        print (amount)
+        
         if amount < 100.00 or amount > 1000000.00:
             return Response({'success':False, 'message':'Amount has exceeded a million naira or lower than hundred naira!!'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -131,12 +132,10 @@ class Deposit(generics.CreateAPIView):
                 beneficiaryAccount.balance+=transactionDetails.Amount
                 beneficiaryAccount.save()
 
-            # ownerAccount = get_object_or_404(self.queryset, accountNumber=request.data['accountNumber'])
-            # if ownerAccount:
-            #     ownerAccount.balance-=transactionDetails.Amount
-            #     ownerAccount.save()
-
-            #save some details in the transacction table
+            #save some details in the transaction table
+            transactionDetails.transactionType = transactionDetails.transactionType[0]
+            transactionDetails.bankName = beneficiaryAccount.bankName
+            transactionDetails.narration = str(transactionDetails.transactionType) + 'ed'+ f" {transactionDetails.Amount}"
             transactionDetails.save()
             return Response({'success':True, 'message':f'You have credited this account {transactionDetails.beneficiaryAccountNumber} with {transactionDetails.Amount}'}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
@@ -163,6 +162,9 @@ class Withdrawal(generics.CreateAPIView):
 
                 bank.balance-=user_account['withdrawnAmount']
                 bank.save()
+
+                #save to transaction table
+
                 return Response({'success':True, 'message':'Your account has been debited with '+ str(user_account['withdrawnAmount'])+ ', left balance is '+f'{bank.balance}'}, status=status.HTTP_200_OK)
 
         return Response({'success':False, 'message':serializer.errors})
