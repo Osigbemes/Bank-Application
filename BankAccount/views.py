@@ -16,15 +16,6 @@ import random, string
 from .models import BankTransaction
 from rest_framework.permissions import AllowAny
 
-def generate_account_id():
-    account_number = get_random_string(10, allowed_chars='0123456789')
-    checkAccountNumber = CustomerAccount.objects.filter(accountNumber=account_number).exists()
-    if not checkAccountNumber:
-        return account_number
-    generate_account_id()
-
-# def random_account_number():
-#     return ''.join(random.choice(string.digits) for _ in range(10))
 
 class RegisterAccount(APIView):
     permission_classes=[AllowAny]
@@ -54,7 +45,7 @@ class RegisterAccount(APIView):
              bankName = user.accountName, accountNumber=user.accountNumber, accountName=user.accountName)
             
             if user:
-                return Response({'success':True, 'message':f'Account created successfully {serializer.data}'}, status=status.HTTP_201_CREATED)
+                return Response({'success':True, 'message':f'Account created successfully {serializer.data}'}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -82,7 +73,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['is_staff']=user.is_staff
         token['is_active']=user.is_active
         return token
-        # return Response({'success':True}, status=status.HTTP_201_CREATED)
 
 class Login(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
