@@ -97,9 +97,10 @@ class GetAccountInfo(APIView):
             return Response({'success':True, 'message':serializer.data}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
 
-class GetAccountStatement(APIView):
-    queryset = BankTransaction
+class GetAccountStatement(generics.RetrieveAPIView):
+    queryset = Bank
     serializer_class = GetAccountStatementSerializer
+
     def get(self, request, accountNumber):
         accountStatement=get_object_or_404(self.queryset, accountNumber=accountNumber)
         # accountStatement=self.queryset.objects.filter(accountNumber=accountNumber).first()
@@ -118,7 +119,7 @@ class Deposit(generics.CreateAPIView):
         amount = Decimal(request.data['Amount'])
         
         if amount < 100.00 or amount > 1000000.00:
-            return Response({'success':False, 'message':'Amount has exceeded a million naira or lower than hundred naira!!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'success':False, 'message':'Unable to deposit, amount exceeds a million naira or lower than hundred naira!!'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.serializer_class(data=request.data)
 
@@ -130,12 +131,16 @@ class Deposit(generics.CreateAPIView):
             # beneficiaryAccount=self.queryset.objects.filter(accountNumber=transactionDetails.beneficiaryAccountNumber).first()
             if beneficiaryAccount:
                 beneficiaryAccount.balance+=transactionDetails.Amount
+                beneficiaryAccount.transactionType = transactionDetails.transactionType[0]
+                beneficiaryAccount.bankName = beneficiaryAccount.bankName
+                beneficiaryAccount.amount=transactionDetails.Amount
+                beneficiaryAccount.narration = f"{transactionDetails.transactionType[0]}" + 'ed'+ f" {transactionDetails.Amount}"
                 beneficiaryAccount.save()
 
             #save some details in the transaction table
             transactionDetails.transactionType = transactionDetails.transactionType[0]
             transactionDetails.bankName = beneficiaryAccount.bankName
-            transactionDetails.narration = str(transactionDetails.transactionType) + 'ed'+ f" {transactionDetails.Amount}"
+            transactionDetails.narration = f"{transactionDetails.transactionType}"+ 'ed'+ f" {transactionDetails.Amount}"
             transactionDetails.save()
             return Response({'success':True, 'message':f'You have credited this account {transactionDetails.beneficiaryAccountNumber} with {transactionDetails.Amount}'}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
