@@ -13,7 +13,7 @@ class CreateCustomerAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerAccount
         fields = ('accountName', 'accountPassword', 'initialDeposit', 'accountNumber')
-        extra_kwargs = {'password': {'write_only':True}, 'accountNumber':{'read_only':True}}
+        extra_kwargs = {'accountPassword': {'write_only':True}, 'accountNumber':{'read_only':True}}
 
     def create(self, validated_data):
         accountPassword = validated_data.pop('accountPassword', None)
