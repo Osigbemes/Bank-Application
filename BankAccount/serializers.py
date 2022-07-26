@@ -66,7 +66,7 @@ class DepositSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BankTransaction
-        fields = ('beneficiaryAccountNumber', 'Amount', 'transactionType')
+        fields = ('accountNumber', 'amount', 'transactionType')
 
 class WithdrawalSerializer(serializers.Serializer):
     TRANSACTIONTYPE=(

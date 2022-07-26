@@ -105,7 +105,7 @@ class Deposit(generics.CreateAPIView):
     def post(self, request):
 
         #check for the right amount of money to be deposited
-        amount = Decimal(request.data['Amount'])
+        amount = Decimal(request.data['amount'])
         
         if amount < 100.00 or amount > 1000000.00:
             return Response({'success':False, 'message':'Unable to deposit, amount exceeds a million naira or lower than hundred naira!!'}, status=status.HTTP_400_BAD_REQUEST)
@@ -116,22 +116,22 @@ class Deposit(generics.CreateAPIView):
             
             transactionDetails = serializer.save()
 
-            beneficiaryAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.beneficiaryAccountNumber)
+            beneficiaryAccount=get_object_or_404(self.queryset, accountNumber=transactionDetails.accountNumber)
             # beneficiaryAccount=self.queryset.objects.filter(accountNumber=transactionDetails.beneficiaryAccountNumber).first()
             if beneficiaryAccount:
-                beneficiaryAccount.balance+=transactionDetails.Amount
+                beneficiaryAccount.balance+=transactionDetails.amount
                 beneficiaryAccount.transactionType = transactionDetails.transactionType[0]
                 beneficiaryAccount.bankName = beneficiaryAccount.bankName
-                beneficiaryAccount.amount=transactionDetails.Amount
-                beneficiaryAccount.narration = f"{transactionDetails.transactionType[0]}" + 'ed'+ f" {transactionDetails.Amount}"
+                beneficiaryAccount.amount=transactionDetails.amount
+                beneficiaryAccount.narration = f"{transactionDetails.transactionType[0]}" + 'ed'+ f" {transactionDetails.amount}"
                 beneficiaryAccount.save()
 
             #save some details in the transaction table
             transactionDetails.transactionType = transactionDetails.transactionType[0]
             transactionDetails.bankName = beneficiaryAccount.bankName
-            transactionDetails.narration = f"{transactionDetails.transactionType}"+ 'ed'+ f" {transactionDetails.Amount}"
+            transactionDetails.narration = f"{transactionDetails.transactionType}"+ 'ed'+ f" {transactionDetails.amount}"
             transactionDetails.save()
-            return Response({'success':True, 'message':f'You have credited this account {transactionDetails.beneficiaryAccountNumber} with {transactionDetails.Amount}'}, status=status.HTTP_200_OK)
+            return Response({'success':True, 'message':f'You have credited this account {transactionDetails.accountNumber} with {transactionDetails.amount}'}, status=status.HTTP_200_OK)
         return Response({'success':False, 'message':serializer.errors})
 
 class Withdrawal(generics.CreateAPIView):
